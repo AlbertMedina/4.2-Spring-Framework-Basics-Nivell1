@@ -1,7 +1,9 @@
 package cat.itacademy.s04.s02.n01.fruit.controllers;
 
+import cat.itacademy.s04.s02.n01.fruit.dto.FruitDTO;
 import cat.itacademy.s04.s02.n01.fruit.model.Fruit;
 import cat.itacademy.s04.s02.n01.fruit.services.FruitServiceImpl;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,53 +20,27 @@ public class FruitController {
     }
 
     @PostMapping("/fruits")
-    public ResponseEntity<Fruit> addFruit(@RequestBody Fruit fruitRequest) {
-        String name = fruitRequest.getName();
-        int weightInKg = fruitRequest.getWeightInKg();
-
-        if (name == null || name.isBlank() || weightInKg <= 0) {
-            return ResponseEntity.badRequest().build();
-        }
-
-        Fruit fruit = fruitService.createFruit(name, weightInKg);
+    public ResponseEntity<Fruit> addFruit(@RequestBody @Valid FruitDTO fruitDTORequest) {
+        Fruit fruit = fruitService.createFruit(fruitDTORequest.getName(), fruitDTORequest.getWeightInKg());
         return ResponseEntity.status(HttpStatus.CREATED).body(fruit);
     }
 
     @PutMapping("/fruits/{id}")
-    public ResponseEntity<Fruit> updateFruit(@PathVariable Long id, @RequestBody Fruit fruitRequest) {
-        String name = fruitRequest.getName();
-        int weightInKg = fruitRequest.getWeightInKg();
-
-        if (name == null || name.isBlank() || weightInKg <= 0) {
-            return ResponseEntity.badRequest().build();
-        }
-
-        try {
-            Fruit updated = fruitService.updateFruit(id, name, weightInKg);
-            return ResponseEntity.ok(updated);
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<Fruit> updateFruit(@PathVariable Long id, @RequestBody @Valid FruitDTO fruitDTORequest) {
+        Fruit fruit = fruitService.updateFruit(id, fruitDTORequest.getName(), fruitDTORequest.getWeightInKg());
+        return ResponseEntity.ok(fruit);
     }
 
     @DeleteMapping("/fruits/{id}")
     public ResponseEntity<Void> removeFruit(@PathVariable Long id) {
-        try {
-            fruitService.removeFruit(id);
-            return ResponseEntity.noContent().build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+        fruitService.removeFruit(id);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/fruits/{id}")
     public ResponseEntity<Fruit> getFruitById(@PathVariable Long id) {
-        try {
-            Fruit fruit = fruitService.getFruitById(id);
-            return ResponseEntity.ok(fruit);
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+        Fruit fruit = fruitService.getFruitById(id);
+        return ResponseEntity.ok(fruit);
     }
 
     @GetMapping("/fruits")
