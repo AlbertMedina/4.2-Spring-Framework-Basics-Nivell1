@@ -17,18 +17,17 @@ public class FruitController {
 
     @PostMapping("/fruits")
     public Fruit addFruit(@RequestBody Fruit fruitRequest) {
-        return fruitService.createFruit(fruitRequest.name(), fruitRequest.weightInKg());
+        return fruitService.createFruit(fruitRequest.getName(), fruitRequest.getWeightInKg());
     }
 
-    @GetMapping("/fruits/{id}")
+    @PutMapping("/fruits/{id}")
     public Fruit updateFruit(@PathVariable Long id, @RequestBody Fruit fruitRequest) {
-        return fruitService.updateFruit(id, fruitRequest.name(), fruitRequest.weightInKg());
+        return fruitService.updateFruit(id, fruitRequest.getName(), fruitRequest.getWeightInKg());
     }
 
-    @GetMapping("/fruits/{id}")
-    public Fruit removeFruit(@PathVariable Long id) {
+    @DeleteMapping("/fruits/{id}")
+    public void removeFruit(@PathVariable Long id) {
         fruitService.removeFruit(id);
-        return null;
     }
 
     @GetMapping("/fruits/{id}")
