@@ -13,8 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.hamcrest.Matchers.notNullValue;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
@@ -37,23 +36,60 @@ public class FruitControllerTest {
     }
 
     @Test
-    void getFruits_returnsEmptyListInitially() throws Exception {
+    void getFruits_shouldReturnEmptyListInitially() throws Exception {
         mockMvc.perform(get("/fruits")).andExpect(status().isOk()).andExpect(content().json("[]"));
     }
 
     @Test
-    void createFruit_returnsFruitWithId() throws Exception {
+    void createFruit_shouldReturnFruitWithId() throws Exception {
         mockMvc.perform(post("/fruits").contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(new FruitDTO("Watermelon", 2))))
                 .andExpect(status().isCreated()).andExpect(jsonPath("$.id").value(notNullValue())).andExpect(jsonPath("$.name").value("Watermelon")).andExpect(jsonPath("$.weightInKg").value(2));
     }
 
     @Test
-    void getFruitById_returnsCorrectFruit() throws Exception {
+    void getFruitById_shouldReturnCorrectFruit() throws Exception {
         String response = mockMvc.perform(post("/fruits").contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(new FruitDTO("Watermelon", 2))))
                 .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();
 
         Fruit fruit = objectMapper.readValue(response, Fruit.class);
 
         mockMvc.perform(get("/fruits/{id}", fruit.getId())).andExpect(jsonPath("$.id").value(notNullValue())).andExpect(jsonPath("$.name").value("Watermelon")).andExpect(jsonPath("$.weightInKg").value(2));
+    }
+
+    @Test
+    void updateFruit_shouldUpdateExistingFruit() throws Exception {
+        String response = mockMvc.perform(post("/fruits").contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(new FruitDTO("Watermelon", 2))))
+                .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();
+
+        Fruit fruit = objectMapper.readValue(response, Fruit.class);
+
+        mockMvc.perform(put("/fruits/{id}", fruit.getId()).contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(new FruitDTO("Melon", 3))))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.id").value(notNullValue())).andExpect(jsonPath("$.name").value("Melon")).andExpect(jsonPath("$.weightInKg").value(3));
+    }
+
+    @Test
+    void removeFruit_shouldRemoveFruitAndReturnNoContent() throws Exception {
+        String response = mockMvc.perform(post("/fruits").contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(new FruitDTO("Watermelon", 2))))
+                .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();
+
+        Fruit fruit = objectMapper.readValue(response, Fruit.class);
+
+        mockMvc.perform(delete("/fruits/{id}", fruit.getId())).andExpect(status().isNoContent());
+
+        mockMvc.perform(get("/fruits/{id}", fruit.getId())).andExpect(status().isNotFound());
+    }
+
+    @Test
+    void getAllFruits_shouldReturnAllExistingFruits() throws Exception {
+        mockMvc.perform(post("/fruits").contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(new FruitDTO("Watermelon", 2))))
+                .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();
+
+        mockMvc.perform(post("/fruits").contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(new FruitDTO("Melon", 3))))
+                .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();
+
+        mockMvc.perform(get("/fruits")).andExpect(status().isOk()).andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[0].id").value(notNullValue())).andExpect(jsonPath("$[0].name").value("Watermelon")).andExpect(jsonPath("$[0].weightInKg").value(2))
+                .andExpect(jsonPath("$[1].id").value(notNullValue())).andExpect(jsonPath("$[1].name").value("Melon")).andExpect(jsonPath("$[1].weightInKg").value(3));
+
     }
 }
