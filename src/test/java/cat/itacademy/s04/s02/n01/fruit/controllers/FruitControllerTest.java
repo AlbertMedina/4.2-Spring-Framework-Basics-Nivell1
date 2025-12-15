@@ -90,6 +90,5 @@ public class FruitControllerTest {
         mockMvc.perform(get("/fruits")).andExpect(status().isOk()).andExpect(jsonPath("$.length()").value(2))
                 .andExpect(jsonPath("$[0].id").value(notNullValue())).andExpect(jsonPath("$[0].name").value("Watermelon")).andExpect(jsonPath("$[0].weightInKg").value(2))
                 .andExpect(jsonPath("$[1].id").value(notNullValue())).andExpect(jsonPath("$[1].name").value("Melon")).andExpect(jsonPath("$[1].weightInKg").value(3));
-
     }
 }

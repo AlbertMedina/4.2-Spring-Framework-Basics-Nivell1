@@ -1,5 +1,6 @@
 package cat.itacademy.s04.s02.n01.fruit.services;
 
+import cat.itacademy.s04.s02.n01.fruit.dto.FruitDTO;
 import cat.itacademy.s04.s02.n01.fruit.model.Fruit;
 import cat.itacademy.s04.s02.n01.fruit.repository.FruitRepository;
 import org.springframework.stereotype.Service;
@@ -16,16 +17,16 @@ public class FruitServiceImpl implements FruitService {
     }
 
     @Override
-    public Fruit createFruit(String name, int weightInKg) {
-        Fruit fruit = new Fruit(name, weightInKg);
+    public Fruit createFruit(FruitDTO fruitDTO) {
+        Fruit fruit = new Fruit(fruitDTO.getName(), fruitDTO.getWeightInKg());
         return fruitRepository.save(fruit);
     }
 
     @Override
-    public Fruit updateFruit(Long id, String name, int weightInKg) {
+    public Fruit updateFruit(Long id, FruitDTO fruitDTO) {
         Fruit fruit = fruitRepository.findById(id).orElseThrow(() -> new RuntimeException("Fruit " + id + "not found"));
-        fruit.setName(name);
-        fruit.setWeightInKg(weightInKg);
+        fruit.setName(fruitDTO.getName());
+        fruit.setWeightInKg(fruitDTO.getWeightInKg());
         return fruitRepository.save(fruit);
     }
 

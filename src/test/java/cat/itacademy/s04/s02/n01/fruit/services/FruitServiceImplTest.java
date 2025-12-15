@@ -1,5 +1,6 @@
 package cat.itacademy.s04.s02.n01.fruit.services;
 
+import cat.itacademy.s04.s02.n01.fruit.dto.FruitDTO;
 import cat.itacademy.s04.s02.n01.fruit.model.Fruit;
 import cat.itacademy.s04.s02.n01.fruit.repository.FruitRepository;
 import org.junit.jupiter.api.Test;
@@ -32,7 +33,7 @@ public class FruitServiceImplTest {
 
         when(fruitRepository.save(any(Fruit.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        Fruit fruit = fruitService.createFruit(name, weightInKg);
+        Fruit fruit = fruitService.createFruit(new FruitDTO(name, weightInKg));
 
         assertNotNull(fruit);
         assertEquals(name, fruit.getName());
@@ -48,7 +49,7 @@ public class FruitServiceImplTest {
         when(fruitRepository.findById(1L)).thenReturn(Optional.of(fruit));
         when(fruitRepository.save(any(Fruit.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        Fruit updated = fruitService.updateFruit(1L, "Melon", 3);
+        Fruit updated = fruitService.updateFruit(1L, new FruitDTO("Melon", 3));
 
         assertEquals("Melon", updated.getName());
         assertEquals(3, updated.getWeightInKg());
